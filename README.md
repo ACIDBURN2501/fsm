@@ -7,6 +7,7 @@ A **lightweight, header‑only** finite state machine (FSM) library written in m
 - Runtime, table‑driven FSM core (`fsm::runtime`).
 - Guard predicates and entry/exit actions.
 - Header‑only `INTERFACE` CMake target – easy to consume.
+- Dot graph (GraphViz) generation via `to_dot`.
 
 ## Getting Started
 
