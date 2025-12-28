@@ -131,12 +131,6 @@ public:
         return Result::Ok;
     }
 
-    /**
-     * @brief Dispatch an event (void context version).
-     *
-     * @param ev   Event to dispatch.
-     * @return Result indicating success or failure reason.
-     */
     inline Result dispatch(Event ev) requires (std::is_void_v<Context>) {
         auto it = table_.find(key(current_, ev));
         if (it == table_.end()) {
