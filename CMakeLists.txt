@@ -23,6 +23,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_library(fsm INTERFACE)
 add_library(fsm::fsm ALIAS fsm)
 
+# Header files for installation
+set(FSM_HEADERS
+    include/fsm/runtime.hpp
+    include/fsm/version.hpp
+)
+
 # Include directories
 target_include_directories(fsm INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -53,7 +59,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(catch2)
 
 add_executable(fsm_tests
-    test/fsm_runtime_tests.cpp)
+    test/fsm_runtime_tests.cpp
+    test/void_context_test.cpp
+    test/int_type_test.cpp
+    test/edge_cases_test.cpp)
 target_link_libraries(fsm_tests PRIVATE fsm Catch2::Catch2WithMain)
 add_test(NAME fsm_tests COMMAND fsm_tests)
 

@@ -14,7 +14,8 @@
  * `inline` so that the library can be used as an INTERFACE target in CMake.
  */
 
-#pragma once
+#ifndef FSM_RUNTIME_HPP
+#define FSM_RUNTIME_HPP
 
 #include <cstdint>
 #include <functional>
@@ -24,6 +25,21 @@
 #include <type_traits>
 
 namespace fsm {
+
+/**
+ * @brief Internal traits to handle void vs non-void context types.
+ */
+template <typename Context>
+struct fsm_types {
+    using Guard = std::function<bool(const Context&)>;
+    using Action = std::function<void(Context&)>;
+};
+
+template <>
+struct fsm_types<void> {
+    using Guard = std::function<bool()>;
+    using Action = std::function<void()>;
+};
 
 /*
  * Forward declaration of helper used by runtime::to_dot
@@ -48,8 +64,8 @@ public:
     /* ------------------------------------------------------------ */
     /* Types                                                        */
     /* ------------------------------------------------------------ */
-    using Guard  = std::function<bool(const Context&)>;   /**< Guard predicate */
-    using Action = std::function<void(Context&)>;       /**< Action to execute on transition */
+    using Guard = typename fsm_types<Context>::Guard;
+    using Action = typename fsm_types<Context>::Action;
 
     /**
      * @brief Structure describing a single transition.
@@ -92,13 +108,14 @@ public:
     }
 
     /**
-     * @brief Dispatch an event, optionally using a context.
+     * @brief Dispatch an event.
      *
      * @param ev   Event to dispatch.
-     * @param ctx  Context passed to guard/action callables.
+     * @param ctx  Context passed to guard/action callables (ignored if Context is void).
      * @return Result indicating success or failure reason.
      */
-    inline Result dispatch(Event ev, Context& ctx) {
+    template <typename C = Context>
+    inline Result dispatch(Event ev, C& ctx) requires (!std::is_void_v<C>) {
         auto it = table_.find(key(current_, ev));
         if (it == table_.end()) {
             return Result::NoTransition;
@@ -109,6 +126,28 @@ public:
         }
         if (tr.action) {
             tr.action(ctx);
+        }
+        current_ = tr.dst;
+        return Result::Ok;
+    }
+
+    /**
+     * @brief Dispatch an event (void context version).
+     *
+     * @param ev   Event to dispatch.
+     * @return Result indicating success or failure reason.
+     */
+    inline Result dispatch(Event ev) requires (std::is_void_v<Context>) {
+        auto it = table_.find(key(current_, ev));
+        if (it == table_.end()) {
+            return Result::NoTransition;
+        }
+        const auto& tr = it->second;
+        if (tr.guard && !tr.guard()) {
+            return Result::GuardRejected;
+        }
+        if (tr.action) {
+            tr.action();
         }
         current_ = tr.dst;
         return Result::Ok;
@@ -153,8 +192,22 @@ private:
      * @return 64‑bit composite key.
      */
     static constexpr uint64_t key(State s, Event e) noexcept {
-        return (static_cast<uint64_t>(static_cast<std::underlying_type_t<State>>(s)) << 32) |
-               static_cast<uint64_t>(static_cast<std::underlying_type_t<Event>>(e));
+        uint64_t s_val = 0;
+        uint64_t e_val = 0;
+
+        if constexpr (std::is_enum_v<State>) {
+            s_val = static_cast<uint64_t>(static_cast<std::underlying_type_t<State>>(s));
+        } else {
+            s_val = static_cast<uint64_t>(s);
+        }
+
+        if constexpr (std::is_enum_v<Event>) {
+            e_val = static_cast<uint64_t>(static_cast<std::underlying_type_t<Event>>(e));
+        } else {
+            e_val = static_cast<uint64_t>(e);
+        }
+
+        return ((s_val & 0xFFFFFFFFULL) << 32) | (e_val & 0xFFFFFFFFULL);
     }
 
     std::unordered_map<uint64_t, Transition> table_; /**< Transition table */
@@ -176,3 +229,5 @@ inline std::string to_string(const T& value) {
 }
 
 } /* namespace fsm */
+
+#endif /* FSM_RUNTIME_HPP */

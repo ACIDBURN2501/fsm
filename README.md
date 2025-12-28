@@ -52,6 +52,16 @@ int main() {
 }
 ```
 
+### Void Context Example
+
+If no context is needed, you can omit the third template parameter:
+
+```cpp
+fsm::runtime<Light, Event> sm(Light::Red);
+sm.add_transition({ Light::Red, Event::Timer, Light::Green, nullptr, nullptr });
+sm.dispatch(Event::Timer); // No context object required
+```
+
 ## Documentation
 
 The library is documented with Doxygen. After building, run:

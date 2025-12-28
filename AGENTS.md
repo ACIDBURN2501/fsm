@@ -70,7 +70,7 @@ Any CI pipeline should run the above steps and fail on un‑formatted code.
 ### Naming Conventions
 | Element | Convention | Example |
 |---------|------------|---------|
-| **Types / Classes** | `PascalCase` | `runtime`, `Context` |
+| **Types / Classes** | `snake_case` (for templates/library) or `PascalCase` | `runtime`, `Context` |
 | **Enum classes** | `PascalCase` for the enum, `CamelCase` values | `enum class Light { Red, Green };` |
 | **Functions / Methods** | `snake_case` | `add_transition`, `dispatch` |
 | **Variables / Parameters** | `snake_case` | `current_state`, `event_id` |
