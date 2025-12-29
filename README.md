@@ -26,6 +26,8 @@ ctest --test-dir build --output-on-failure
 
 ## Basic Usage (runtime FSM)
 
+*For a detailed implementation and usage guide, see the [Implementation Guide](docs/implementation_guide.md).*
+
 ```cpp
 #include <fsm/runtime.hpp>
 
