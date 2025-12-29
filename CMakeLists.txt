@@ -62,7 +62,8 @@ add_executable(fsm_tests
     test/fsm_runtime_tests.cpp
     test/void_context_test.cpp
     test/int_type_test.cpp
-    test/edge_cases_test.cpp)
+    test/edge_cases_test.cpp
+    test/dot_graph_test.cpp)
 target_link_libraries(fsm_tests PRIVATE fsm Catch2::Catch2WithMain)
 add_test(NAME fsm_tests COMMAND fsm_tests)
 
