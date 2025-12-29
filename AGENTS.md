@@ -106,6 +106,8 @@ Any CI pipeline should run the above steps and fail on un‑formatted code.
 * **`[[likely]]` / `[[unlikely]]`** may be added to the dispatch lookup for optimisation.
 ---
 ## Repository‑Specific Rules
+* **Commit messages** should follow the **Conventional Commits** format (e.g., `docs: update README with link`, `feat(runtime): add guard support`). This ensures consistent changelog generation and clear history.
+
 * **`.clang-format`** is the single source of truth for formatting; do not diverge.
 * **No `.cursor` or Copilot instruction files** exist – agents should rely on the guidelines above.
 * **All new public headers must be added to `include/fsm/`** and listed in the install target (`CMakeLists.txt`).
